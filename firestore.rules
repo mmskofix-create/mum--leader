@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
+    function isOperator() {
+      return signedIn() && (request.auth.token.operator == true || request.auth.token.admin == true);
+    }
+
+    match /candidates/{candidateId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /students/{studentId} {
+      allow read: if isOperator();
+      allow create, delete: if isAdmin();
+      allow update: if isOperator()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(['voted', 'votedAt'])
+        && resource.data.voted == false
+        && request.resource.data.voted == true;
+    }
+
+    match /votes/{voteId} {
+      allow read: if isAdmin();
+      allow create: if isOperator()
+        && request.resource.data.keys().hasOnly(['studentId', 'boy', 'girl', 'createdAt'])
+        && !exists(/databases/$(database)/documents/votes/$(voteId));
+      allow update, delete: if isAdmin();
+    }
+
+    match /system/election {
+      allow read: if signedIn();
+      allow write: if isOperator();
+    }
+  }
+}

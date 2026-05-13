@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Madrasa Election Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="topbar" aria-label="Application navigation">
+    <div class="brand">
+      <div class="brand-mark">☪</div>
+      <div>
+        <p class="kicker">مدرسہ الیکشن</p>
+        <h1>Madrasa Election Platform</h1>
+      </div>
+    </div>
+    <nav class="section-tabs" aria-label="Sections">
+      <button class="tab active" data-section="booth">Voting Booth</button>
+      <button class="tab" data-section="control">Control Center</button>
+      <button class="tab" data-section="screening">Live Display</button>
+      <button class="tab" data-section="admin">Admin Panel</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="booth" class="app-section active booth-shell" aria-labelledby="booth-title">
+      <div class="booth-status" id="boothStatus">Waiting for operator authorization</div>
+      <div class="booth-card">
+        <div class="section-heading centered">
+          <p class="arabic-title">بسم الله الرحمن الرحيم</p>
+          <h2 id="booth-title">Student Voting Booth</h2>
+          <p class="muted" id="authorizedStudent">Please wait until your class and roll number are authorized.</p>
+        </div>
+
+        <div class="locked-panel" id="lockedPanel">
+          <div class="lock-icon">🔒</div>
+          <h3>Voting Screen Locked</h3>
+          <p>Only the next authorized student can access this booth.</p>
+        </div>
+
+        <form id="voteForm" class="vote-form hidden">
+          <div class="candidate-grid" id="candidateGrid"></div>
+          <button class="primary-action vote-submit" type="submit">Submit My Vote</button>
+          <p class="form-note">Select exactly one boy candidate and one girl candidate.</p>
+        </form>
+
+        <div class="success-panel hidden" id="successPanel" role="status" aria-live="polite">
+          <div class="success-ring">✓</div>
+          <h3>Your vote has been successfully recorded.</h3>
+          <p>The booth is locking for the next voter.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="control" class="app-section" aria-labelledby="control-title">
+      <div class="dashboard-grid">
+        <article class="panel operator-panel">
+          <div class="section-heading">
+            <p class="kicker">Teacher / Operator</p>
+            <h2 id="control-title">Control Center</h2>
+            <p class="muted">Authorize one student at a time. Duplicate voters are rejected automatically.</p>
+          </div>
+          <div class="field-row">
+            <label>Class
+              <select id="operatorClass"></select>
+            </label>
+            <label>Roll Number
+              <select id="operatorRoll"></select>
+            </label>
+          </div>
+          <div class="operator-actions">
+            <button class="primary-action" id="unlockBtn">Unlock Voting Screen</button>
+            <button class="danger-action" id="pauseBtn">Pause Voting</button>
+          </div>
+          <div class="notice" id="operatorNotice">Select a student to begin.</div>
+        </article>
+
+        <article class="panel stats-panel">
+          <div class="section-heading compact">
+            <p class="kicker">Realtime Attendance</p>
+            <h2>Polling Tracker</h2>
+          </div>
+          <div class="metric-grid">
+            <div class="metric"><span id="totalVoted">0</span><small>Total Voted</small></div>
+            <div class="metric"><span id="remainingStudents">0</span><small>Remaining</small></div>
+            <div class="metric"><span id="boysTurnout">0</span><small>Boys Turnout</small></div>
+            <div class="metric"><span id="girlsTurnout">0</span><small>Girls Turnout</small></div>
+          </div>
+          <div class="class-tracking" id="classTracking"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="screening" class="app-section live-display" aria-labelledby="screening-title">
+      <div class="broadcast-header">
+        <div>
+          <p class="arabic-title">انتخابی نشریات</p>
+          <h2 id="screening-title">Live Election Screening</h2>
+        </div>
+        <div class="timer-card">
+          <small>Countdown</small>
+          <strong id="countdown">00:00:00</strong>
+        </div>
+      </div>
+      <div class="broadcast-grid">
+        <article class="broadcast-card hero-percent">
+          <span id="overallPercent">0%</span>
+          <p>Overall Polling Completed</p>
+          <div class="progress"><i id="overallBar"></i></div>
+        </article>
+        <article class="broadcast-card turnout-card"><strong id="screenBoys">0</strong><span>Boys Turnout</span></article>
+        <article class="broadcast-card turnout-card"><strong id="screenGirls">0</strong><span>Girls Turnout</span></article>
+        <article class="broadcast-card turnout-card"><strong id="screenTotal">0</strong><span>Total Voted</span></article>
+        <article class="broadcast-card turnout-card"><strong id="screenRemaining">0</strong><span>Remaining</span></article>
+      </div>
+      <div class="panel class-broadcast">
+        <h3>Class-wise Polling Percentage</h3>
+        <div id="screenClassBars"></div>
+      </div>
+    </section>
+
+    <section id="admin" class="app-section" aria-labelledby="admin-title">
+      <div class="admin-login panel" id="adminLogin">
+        <div class="section-heading centered">
+          <p class="kicker">Principal Access</p>
+          <h2 id="admin-title">Secure Admin Panel</h2>
+          <p class="muted">Default demo password: <strong>admin123</strong>. Change it before production use.</p>
+        </div>
+        <label>Admin Password
+          <input id="adminPassword" type="password" placeholder="Enter password" />
+        </label>
+        <button class="primary-action" id="loginBtn">Login</button>
+      </div>
+
+      <div class="admin-dashboard hidden" id="adminDashboard">
+        <div class="dashboard-grid admin-grid">
+          <article class="panel">
+            <div class="section-heading compact"><p class="kicker">Candidate Management</p><h2>Candidates</h2></div>
+            <form id="candidateForm" class="stacked-form">
+              <input id="candidateName" placeholder="Candidate name" required />
+              <select id="candidateGender"><option value="boy">Boy category</option><option value="girl">Girl category</option></select>
+              <input id="candidatePhoto" placeholder="Photo URL" required />
+              <button class="primary-action" type="submit">Add Candidate</button>
+            </form>
+            <div id="candidateList" class="list"></div>
+          </article>
+
+          <article class="panel">
+            <div class="section-heading compact"><p class="kicker">Student Database</p><h2>Students</h2></div>
+            <form id="studentForm" class="stacked-form">
+              <input id="studentName" placeholder="Student name" required />
+              <input id="studentClass" placeholder="Class" required />
+              <input id="studentRoll" placeholder="Roll number" required />
+              <select id="studentGender"><option value="boy">Boy</option><option value="girl">Girl</option></select>
+              <button class="primary-action" type="submit">Add Student</button>
+            </form>
+            <div id="studentList" class="list"></div>
+          </article>
+
+          <article class="panel controls-panel">
+            <div class="section-heading compact"><p class="kicker">Election Controls</p><h2>Control Room</h2></div>
+            <div class="control-buttons">
+              <button id="startElection" class="primary-action">Start Election</button>
+              <button id="adminPause" class="warning-action">Pause Election</button>
+              <button id="endElection" class="danger-action">End Election</button>
+              <button id="resetElection" class="ghost-action">Reset Election</button>
+            </div>
+            <div class="notice" id="electionStateNotice">Election status: ready</div>
+          </article>
+
+          <article class="panel results-panel">
+            <div class="section-heading compact"><p class="kicker">Secure Result System</p><h2>Final Results</h2></div>
+            <p class="muted">Candidate vote counts stay hidden until the election is ended by admin.</p>
+            <div id="resultsLock" class="locked-results">🔐 Results locked during voting</div>
+            <div id="resultList" class="list hidden"></div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
