@@ -1,6 +1,6 @@
 # Madrasa Election Platform
 
-A responsive, professional Islamic-style digital election web application for a madrasa or school election. The app is built with HTML, CSS, JavaScript, and optional Firebase Firestore synchronization.
+A responsive, professional digital election web application for a madrasa or school election. The app is built with HTML, CSS, JavaScript, and optional Firebase Firestore synchronization.
 
 ## Sections
 
@@ -8,6 +8,10 @@ A responsive, professional Islamic-style digital election web application for a 
 2. **Control Center** — an operator dashboard for teachers to select a class and roll number, reject duplicate voters, unlock the booth, pause voting, and monitor attendance.
 3. **Live Screening Display** — a projector/TV-safe display that shows turnout percentages, class-wise progress, turnout by gender, total voted, remaining students, and a countdown timer. Candidate vote totals are never displayed here.
 4. **Admin Panel** — password-protected administration for candidates, students, election state, reset controls, and final result viewing after the election ends.
+
+## Appearance
+
+The interface uses a clean institutional design instead of an Islamic visual theme. Users can switch between light mode and dark mode from the header, and the selected theme is saved in the browser.
 
 ## Firebase setup
 

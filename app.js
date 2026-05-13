@@ -24,6 +24,7 @@ const firebaseConfig = {
 const forceDemoMode = new URLSearchParams(window.location.search).has('demo');
 const usingFirebase = !forceDemoMode && !firebaseConfig.apiKey.includes('PASTE_');
 const demoStoreKey = 'madrasa-election-state-v1';
+const themeStoreKey = 'madrasa-election-theme';
 let db;
 
 if (usingFirebase) {
@@ -118,6 +119,25 @@ function render() {
   renderStats();
   renderAdmin();
   renderResults();
+}
+
+function applyTheme(theme) {
+  document.body.dataset.theme = theme;
+  const toggle = $('#themeToggle');
+  if (toggle) {
+    toggle.textContent = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+    toggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+}
+
+function setupTheme() {
+  const savedTheme = localStorage.getItem(themeStoreKey) || 'light';
+  applyTheme(savedTheme);
+  $('#themeToggle').addEventListener('click', () => {
+    const nextTheme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(themeStoreKey, nextTheme);
+    applyTheme(nextTheme);
+  });
 }
 
 function electionOpen() {
@@ -333,6 +353,7 @@ function updateCountdown() {
   $('#countdown').textContent = `${hours}:${minutes}:${seconds}`;
 }
 
+setupTheme();
 bindEvents();
 setupFirebaseListeners();
 setInterval(updateCountdown, 1000);

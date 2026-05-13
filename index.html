@@ -6,18 +6,18 @@
   <title>Madrasa Election Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-theme="light">
   <div class="ambient ambient-one"></div>
   <div class="ambient ambient-two"></div>
 
   <header class="topbar" aria-label="Application navigation">
     <div class="brand">
-      <div class="brand-mark">☪</div>
+      <div class="brand-mark">ME</div>
       <div>
-        <p class="kicker">مدرسہ الیکشن</p>
+        <p class="kicker">Digital Election Suite</p>
         <h1>Madrasa Election Platform</h1>
       </div>
     </div>
@@ -26,6 +26,7 @@
       <button class="tab" data-section="control">Control Center</button>
       <button class="tab" data-section="screening">Live Display</button>
       <button class="tab" data-section="admin">Admin Panel</button>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode">🌙 Dark</button>
     </nav>
   </header>
 
@@ -34,7 +35,7 @@
       <div class="booth-status" id="boothStatus">Waiting for operator authorization</div>
       <div class="booth-card">
         <div class="section-heading centered">
-          <p class="arabic-title">بسم الله الرحمن الرحيم</p>
+          <p class="eyebrow">Secure Student Voting</p>
           <h2 id="booth-title">Student Voting Booth</h2>
           <p class="muted" id="authorizedStudent">Please wait until your class and roll number are authorized.</p>
         </div>
@@ -101,7 +102,7 @@
     <section id="screening" class="app-section live-display" aria-labelledby="screening-title">
       <div class="broadcast-header">
         <div>
-          <p class="arabic-title">انتخابی نشریات</p>
+          <p class="eyebrow">Broadcast View</p>
           <h2 id="screening-title">Live Election Screening</h2>
         </div>
         <div class="timer-card">
