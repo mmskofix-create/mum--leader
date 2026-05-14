@@ -189,6 +189,8 @@ function renderOperator() {
 function getStats() {
   const total = state.students.length;
   const votedStudents = state.students.filter((student) => student.voted);
+  const boysTotal = state.students.filter((student) => student.gender === 'boy').length;
+  const girlsTotal = state.students.filter((student) => student.gender === 'girl').length;
   const boys = votedStudents.filter((student) => student.gender === 'boy').length;
   const girls = votedStudents.filter((student) => student.gender === 'girl').length;
   const classes = [...new Set(state.students.map((student) => student.className))].sort().map((className) => {
@@ -196,7 +198,21 @@ function getStats() {
     const voted = students.filter((student) => student.voted).length;
     return { className, total: students.length, voted, percent: students.length ? Math.round((voted / students.length) * 100) : 0 };
   });
-  return { total, voted: votedStudents.length, remaining: total - votedStudents.length, boys, girls, percent: total ? Math.round((votedStudents.length / total) * 100) : 0, classes };
+  const topClass = [...classes].sort((a, b) => b.percent - a.percent || b.voted - a.voted || a.className.localeCompare(b.className))[0];
+  return {
+    total,
+    voted: votedStudents.length,
+    remaining: total - votedStudents.length,
+    boys,
+    girls,
+    boysTotal,
+    girlsTotal,
+    boysPercent: boysTotal ? Math.round((boys / boysTotal) * 100) : 0,
+    girlsPercent: girlsTotal ? Math.round((girls / girlsTotal) * 100) : 0,
+    percent: total ? Math.round((votedStudents.length / total) * 100) : 0,
+    classes,
+    topClass
+  };
 }
 
 function renderStats() {
@@ -207,16 +223,97 @@ function renderStats() {
   $('#girlsTurnout').textContent = stats.girls;
   $('#screenTotal').textContent = stats.voted;
   $('#screenRemaining').textContent = stats.remaining;
-  $('#screenBoys').textContent = stats.boys;
-  $('#screenGirls').textContent = stats.girls;
+  $('#screenTotalMeta').textContent = `${stats.voted} of ${stats.total} students`;
+  $('#screenTopClass').textContent = stats.topClass?.className || '—';
+  $('#screenTopClassMeta').textContent = stats.topClass ? `${stats.topClass.voted}/${stats.topClass.total} • ${stats.topClass.percent}% complete` : 'No turnout yet';
+  $('#screenGenderBalance').textContent = `${stats.boys} / ${stats.girls}`;
+  $('#screenBoysMeta').textContent = `${stats.boys} voted • ${stats.boysPercent}%`;
+  $('#screenGirlsMeta').textContent = `${stats.girls} voted • ${stats.girlsPercent}%`;
+  $('#screenBoysBar').style.width = `${stats.boysPercent}%`;
+  $('#screenGirlsBar').style.width = `${stats.girlsPercent}%`;
   $('#overallPercent').textContent = `${stats.percent}%`;
+  $('#overallRing').style.setProperty('--percent', stats.percent);
   $('#overallBar').style.width = `${stats.percent}%`;
+  $('#screenParticipationSummary').textContent = `${stats.voted} votes collected, ${stats.remaining} students remaining, ${stats.percent}% polling completed.`;
+  renderLiveStatus();
   $('#classTracking').innerHTML = stats.classes.map(classBar).join('');
-  $('#screenClassBars').innerHTML = stats.classes.map(classBar).join('');
+  $('#screenClassBars').innerHTML = stats.classes.map(classChartRow).join('');
+  renderActivity(stats);
+  renderCandidateGraph();
+}
+
+function renderLiveStatus() {
+  const pill = $('#liveStatusPill');
+  pill.classList.remove('paused', 'ended');
+  if (state.election.status === 'active') {
+    pill.textContent = state.election.boothLocked ? 'Live • Booth Locked' : 'Live • Vote Open';
+    return;
+  }
+  if (state.election.status === 'paused') {
+    pill.textContent = 'Paused';
+    pill.classList.add('paused');
+    return;
+  }
+  if (state.election.status === 'ended') {
+    pill.textContent = 'Ended • Results Open';
+    pill.classList.add('ended');
+    return;
+  }
+  pill.textContent = 'Ready';
 }
 
 function classBar(row) {
   return `<div class="class-row"><div class="row-top"><span>${row.className}</span><span>${row.voted}/${row.total} • ${row.percent}%</span></div><div class="progress"><i style="width:${row.percent}%"></i></div></div>`;
+}
+
+function classChartRow(row) {
+  return `<div class="class-row"><div class="row-top"><span>${row.className}</span><div class="graph-track"><i style="width:${row.percent}%"></i></div><span>${row.voted}/${row.total} • ${row.percent}%</span></div></div>`;
+}
+
+function timestampValue(value) {
+  if (!value) return 0;
+  if (typeof value === 'number') return value;
+  if (typeof value.toMillis === 'function') return value.toMillis();
+  if (value.seconds) return value.seconds * 1000;
+  return 0;
+}
+
+function renderActivity(stats) {
+  const recentVotes = [...state.votes].sort((a, b) => timestampValue(a.createdAt) - timestampValue(b.createdAt));
+  const maxVotes = Math.max(1, stats.voted);
+  const bars = Array.from({ length: 12 }, (_, index) => {
+    const votePosition = Math.ceil(((index + 1) / 12) * maxVotes);
+    const active = recentVotes.length >= votePosition;
+    const height = active ? 18 + Math.round((votePosition / maxVotes) * 82) : 8;
+    return `<i class="activity-bar ${active ? 'active' : ''}" style="height:${height}%"></i>`;
+  }).join('');
+  $('#screenActivityRail').innerHTML = bars;
+  $('#screenVoteRate').textContent = `${stats.voted} votes`;
+
+  const latestVote = [...state.votes].sort((a, b) => timestampValue(b.createdAt) - timestampValue(a.createdAt))[0];
+  const student = latestVote ? state.students.find((entry) => entry.id === latestVote.studentId) : null;
+  $('#screenLatestVote').textContent = student ? `Latest vote recorded from ${student.className} • Roll ${student.roll}.` : 'No votes recorded yet.';
+}
+
+function renderCandidateGraph() {
+  const resultContainer = $('#screenCandidateGraph');
+  if (state.election.status !== 'ended') {
+    resultContainer.innerHTML = '<div class="locked-result-card">🔐 Candidate vote graph will reveal after the admin ends the election.</div>';
+    return;
+  }
+
+  const totals = state.candidates.map((candidate) => ({
+    ...candidate,
+    count: state.votes.filter((vote) => vote[candidate.gender] === candidate.id).length
+  }));
+  const maxCount = Math.max(1, ...totals.map((candidate) => candidate.count));
+  resultContainer.innerHTML = totals.map((candidate) => `
+    <div class="result-row">
+      <span>${candidate.name}</span>
+      <div class="graph-track"><i style="width:${Math.round((candidate.count / maxCount) * 100)}%"></i></div>
+      <strong>${candidate.count}</strong>
+    </div>
+  `).join('') || '<div class="locked-result-card">No candidates available.</div>';
 }
 
 function renderAdmin() {

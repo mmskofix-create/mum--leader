@@ -104,26 +104,69 @@
         <div>
           <p class="eyebrow">Broadcast View</p>
           <h2 id="screening-title">Live Election Screening</h2>
+          <p class="muted" id="screenParticipationSummary">Realtime turnout, class progress, and protected result updates.</p>
         </div>
-        <div class="timer-card">
-          <small>Countdown</small>
-          <strong id="countdown">00:00:00</strong>
+        <div class="broadcast-actions">
+          <div class="live-status-pill" id="liveStatusPill">Ready</div>
+          <div class="timer-card">
+            <small>Countdown</small>
+            <strong id="countdown">00:00:00</strong>
+          </div>
         </div>
       </div>
-      <div class="broadcast-grid">
+
+      <div class="live-command-grid">
         <article class="broadcast-card hero-percent">
-          <span id="overallPercent">0%</span>
-          <p>Overall Polling Completed</p>
-          <div class="progress"><i id="overallBar"></i></div>
+          <div class="turnout-ring" id="overallRing" style="--percent: 0">
+            <span id="overallPercent">0%</span>
+          </div>
+          <div>
+            <p>Overall Polling Completed</p>
+            <div class="progress"><i id="overallBar"></i></div>
+          </div>
         </article>
-        <article class="broadcast-card turnout-card"><strong id="screenBoys">0</strong><span>Boys Turnout</span></article>
-        <article class="broadcast-card turnout-card"><strong id="screenGirls">0</strong><span>Girls Turnout</span></article>
-        <article class="broadcast-card turnout-card"><strong id="screenTotal">0</strong><span>Total Voted</span></article>
-        <article class="broadcast-card turnout-card"><strong id="screenRemaining">0</strong><span>Remaining</span></article>
+
+        <article class="broadcast-card turnout-card"><small>Total Voted</small><strong id="screenTotal">0</strong><span id="screenTotalMeta">0 of 0 students</span></article>
+        <article class="broadcast-card turnout-card"><small>Remaining</small><strong id="screenRemaining">0</strong><span>students waiting</span></article>
+        <article class="broadcast-card turnout-card"><small>Leading Class</small><strong id="screenTopClass">—</strong><span id="screenTopClassMeta">No turnout yet</span></article>
       </div>
-      <div class="panel class-broadcast">
-        <h3>Class-wise Polling Percentage</h3>
-        <div id="screenClassBars"></div>
+
+      <div class="live-insight-grid">
+        <article class="panel graph-panel gender-graph">
+          <div class="graph-heading">
+            <div><p class="kicker">Gender Turnout</p><h3>Boys vs Girls Participation</h3></div>
+            <strong id="screenGenderBalance">0 / 0</strong>
+          </div>
+          <div class="split-graph" aria-label="Gender turnout comparison">
+            <div class="split-row boys"><div class="row-top"><span>Boys</span><span id="screenBoysMeta">0 voted • 0%</span></div><div class="graph-track"><i id="screenBoysBar"></i></div></div>
+            <div class="split-row girls"><div class="row-top"><span>Girls</span><span id="screenGirlsMeta">0 voted • 0%</span></div><div class="graph-track"><i id="screenGirlsBar"></i></div></div>
+          </div>
+        </article>
+
+        <article class="panel graph-panel class-broadcast">
+          <div class="graph-heading">
+            <div><p class="kicker">Class Graph</p><h3>Class-wise Polling Percentage</h3></div>
+            <span class="graph-badge">Live</span>
+          </div>
+          <div id="screenClassBars" class="class-chart"></div>
+        </article>
+
+        <article class="panel graph-panel activity-panel">
+          <div class="graph-heading">
+            <div><p class="kicker">Live Pulse</p><h3>Voting Activity</h3></div>
+            <span class="graph-badge" id="screenVoteRate">0 votes</span>
+          </div>
+          <div class="activity-rail" id="screenActivityRail"></div>
+          <div class="notice compact-notice" id="screenLatestVote">No votes recorded yet.</div>
+        </article>
+
+        <article class="panel graph-panel result-preview">
+          <div class="graph-heading">
+            <div><p class="kicker">Protected Results</p><h3>Candidate Result Graph</h3></div>
+            <span class="graph-badge">Auto Reveal</span>
+          </div>
+          <div id="screenCandidateGraph" class="candidate-result-graph"></div>
+        </article>
       </div>
     </section>
 
